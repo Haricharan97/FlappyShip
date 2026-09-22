@@ -21,12 +21,15 @@ gravity = 0.5
 jump = -8
 
 obstacle_x = 800
-obstacle_y = 350
 
 obstacle_width = 60
-obstacle_height = 40
-
 obstacle_speed = 4
+
+gap = 180
+
+top_obstacle = 180
+bottom_obstacle = top_obstacle + gap
+
 
 running = True
 
@@ -56,7 +59,7 @@ while running:
 
     obstacle_x = obstacle_x - obstacle_speed
 
-    if obstacle_x < -obstacle_x < -obstacle_width:
+    if obstacle_x < obstacle_width:
          obstacle_x = width
 
     screen.fill((70,150,220))
@@ -70,7 +73,13 @@ while running:
     pygame.draw.rect(
          screen,
          (80,80,80),
-         (obstacle_x, obstacle_y, obstacle_width, obstacle_height)
+         (obstacle_x, 0, obstacle_width, top_obstacle)
+    )
+
+    pygame.draw.rect(
+         screen,
+         (80,80,80),
+         (obstacle_x, bottom_obstacle, obstacle_width, height - bottom_obstacle)
     )
 
     pygame.display.flip()
