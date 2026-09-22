@@ -1,4 +1,5 @@
 import pygame
+import random
 
 pygame.init()
 
@@ -30,6 +31,7 @@ gap = 180
 top_obstacle = 180
 bottom_obstacle = top_obstacle + gap
 
+game_over = False
 
 running = True
 
@@ -46,21 +48,56 @@ while running:
             if event.key == pygame.K_SPACE:
                 boat_speed = jump
 
-    boat_speed = boat_speed + gravity
-    boat_y = boat_y + boat_speed
+    if game_over == False:
 
-    if boat_y < 0:
+        boat_speed = boat_speed + gravity
+        boat_y = boat_y + boat_speed
+
+        if boat_y < 0:
             boat_y = 0
             boat_speed = 0
 
-    if boat_y  > height - boat_height:
+        if boat_y  > height - boat_height:
             boat_y = height - boat_height
             boat_speed = 0
 
-    obstacle_x = obstacle_x - obstacle_speed
+        obstacle_x = obstacle_x - obstacle_speed
 
-    if obstacle_x < obstacle_width:
-         obstacle_x = width
+        if obstacle_x < obstacle_width:
+            obstacle_x = width
+
+            top_obstacle = random.randint(75, 375)
+            bottom_obstacle = top_obstacle + gap
+
+    if boat_y < 0:
+         boat_y = 0
+
+    if boat_y > height - boat_height:
+         boat_y = height - boat_height
+
+    boat_rect = pygame.Rect(
+         boat_x,
+         boat_y,
+         boat_width,
+         boat_height
+    )
+
+    top_rect = pygame.Rect(
+        obstacle_x,
+        0,
+        obstacle_width,
+        top_obstacle
+    )
+
+    bottom_rect = pygame.Rect(
+        obstacle_x,
+        bottom_obstacle,
+        obstacle_width,
+        height - bottom_obstacle
+    )
+
+    if boat_rect.colliderect(top_rect) or boat_rect.colliderect(bottom_rect):
+        game_over = True
 
     screen.fill((70,150,220))
 
@@ -81,6 +118,14 @@ while running:
          (80,80,80),
          (obstacle_x, bottom_obstacle, obstacle_width, height - bottom_obstacle)
     )
+
+    if game_over == True:
+        text = pygame.font.render(
+            "GAME OVER",
+            (255,255,255)
+        )
+
+        screen.blit(text, (240,250))
 
     pygame.display.flip()
 
