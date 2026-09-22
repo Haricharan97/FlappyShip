@@ -20,6 +20,14 @@ boat_speed = 0
 gravity = 0.5
 jump = -8
 
+obstacle_x = 800
+obstacle_y = 350
+
+obstacle_width = 60
+obstacle_height = 40
+
+obstacle_speed = 4
+
 running = True
 
 while running:
@@ -31,6 +39,7 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
+
             if event.key == pygame.K_SPACE:
                 boat_speed = jump
 
@@ -45,6 +54,11 @@ while running:
             boat_y = height - boat_height
             boat_speed = 0
 
+    obstacle_x = obstacle_x - obstacle_speed
+
+    if obstacle_x < -obstacle_x < -obstacle_width:
+         obstacle_x = width
+
     screen.fill((70,150,220))
 
     pygame.draw.rect(
@@ -52,6 +66,12 @@ while running:
             (120,70,30),
             (boat_x, boat_y, boat_width, boat_height)
         )
+
+    pygame.draw.rect(
+         screen,
+         (80,80,80),
+         (obstacle_x, obstacle_y, obstacle_width, obstacle_height)
+    )
 
     pygame.display.flip()
 
