@@ -39,6 +39,7 @@ top2 = random.randint(75, 375)
 bottom2 = top2 + gap
 
 score = 0
+high_score = 0
 passed1 = False
 passed2 = False
 
@@ -128,7 +129,7 @@ while running:
                     treasure_timer = 0
 
                     treasure_x = width + 100
-                    treasure_y = random.randint(100,450)
+                    treasure_y = random.randint(100,500)
 
                     obstacle_speed = 4 
                     wave_offset = 0
@@ -195,6 +196,9 @@ while running:
             score = score + 1
             passed1 = True
 
+            if score > high_score:
+                 high_score = score
+
             obstacle_speed = 4 + score * 0.2
 
             if obstacle_speed > 8:
@@ -203,6 +207,9 @@ while running:
         if obstacle2_x < boat_x and passed2 == False:
             score = score + 1
             passed2 = True
+
+            if score > high_score:
+                 high_score = score
 
             obstacle_speed = 4 + score * 0.2
 
@@ -508,6 +515,14 @@ while running:
     )
 
     screen.blit(coin_text, (20,20))
+
+    high_score_text = small_font.render(
+         "High Score: " + str(high_score),
+         True,
+         (255,255,255)
+    )
+
+    screen.blit(high_score_text, (580,20))
 
     if game_state == start:
 
