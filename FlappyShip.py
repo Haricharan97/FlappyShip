@@ -52,8 +52,18 @@ coin1_y = top1 + gap // 2
 coin2_x = obstacle2_x + obstacle_width // 2
 coin2_y = top2 + gap // 2
 
+coin3_x = (obstacle1_x + obstacle2_x) // 2
+coin3_y = 250
+
 coin1_collected = False
 coin2_collected = False
+coin3_collected = False
+
+treasure_x = width + 100
+treasure_y = random.randint(100, 450)
+treasure_size = 28
+treasure_active = False
+treasure_timer = 0
 
 wave_offset = 0
 
@@ -101,11 +111,24 @@ while running:
 
                     coins = 0
 
+                    coin1_x = (obstacle1_x + obstacle_width) // 2
                     coin1_y = top1 + gap // 2
+
+                    coin2_x = (obstacle2_x + obstacle_width) // 2
                     coin2_y = top2 + gap // 2
+
+                    coin3_x = (obstacle1_x + obstacle2_x) // 2
+                    coin3_y = 250
 
                     coin1_collected = False
                     coin2_collected = False
+                    coin3_collected = False
+
+                    treasure_active = False
+                    treasure_timer = 0
+
+                    treasure_x = width + 100
+                    treasure_y = random.randint(100,450)
 
                     obstacle_speed = 4 
                     wave_offset = 0
@@ -144,6 +167,29 @@ while running:
 
         coin1_x = obstacle1_x + obstacle_width // 2
         coin2_x = obstacle2_x + obstacle_width // 2
+        coin3_x = coin3_x - obstacle_speed
+
+        if coin3_x < -coin_size:
+             coin3_x = width + 250
+             coin3_y = random.randint(120, 480)
+             coin3_collected = False
+
+        treasure_timer = treasure_timer + 1
+
+        if treasure_active == False and treasure_timer > 180:
+
+            if random.randint(1,100) <= 3:
+                treasure_active = True
+                treasure_x = width + 50
+                treasure_y = random.randint(100, 500)
+                treasure_timer = 0
+
+        if treasure_active == True:
+                treasure_x = treasure_x - obstacle_speed
+
+        if treasure_x < -treasure_size:
+                 treasure_active = False
+                 treasure_timer = 0
 
         if obstacle1_x < boat_x and passed1 == False:
             score = score + 1
@@ -237,6 +283,20 @@ while running:
         coin_size
     )
 
+    coin3_rect = pygame.Rect(
+        coin3_x - coin_size // 2,
+        coin3_y - coin_size //2,
+        coin_size,
+        coin_size
+    )
+
+    treasure_rect = pygame.Rect(
+         treasure_x - treasure_size // 2,
+         treasure_y - treasure_size // 2,
+         treasure_size,
+         treasure_size
+    )
+
     if game_state == playing and game_over == False:
 
         if boat_y < 0:
@@ -258,6 +318,16 @@ while running:
         if boat_rect.colliderect(coin2_rect) and coin2_collected == False:
              coins = coins + 1
              coin2_collected = True
+
+        if boat_rect.colliderect(coin3_rect) and coin3_collected == False:
+             coins = coins + 1
+             coin3_collected = True
+
+        if treasure_active == True:
+             if boat_rect.colliderect(treasure_rect):
+                  coins = coins + 5
+                  treasure_active = False
+                  treasure_timer = 0
 
     screen.fill((70,150,220))
 
@@ -381,6 +451,46 @@ while running:
               (255, 220, 0),
               (int(coin2_x), int(coin2_y)),
               10
+         )
+
+    if coin3_collected == False:
+
+         pygame.draw.circle(
+              screen,
+              (255, 220, 0),
+              (int(coin3_x), int(coin3_y)),
+              10
+         )
+
+    if treasure_active == True:
+         pygame.draw.circle(
+              screen,
+              (100,55,20),
+              (
+                   int(treasure_x),
+                   int(treasure_y)
+              ),
+              16
+         )
+
+         pygame.draw.circle(
+              screen,
+              (180,100,35),
+              (
+                   int(treasure_x),
+                   int(treasure_y)
+              ),
+              9
+         )
+
+         pygame.draw.circle(
+              screen,
+              (255, 190, 50),
+              (
+                   int(treasure_x),
+                   int(treasure_y)
+              ),
+              4
          )
 
     score_text = font.render(
