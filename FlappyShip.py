@@ -44,7 +44,13 @@ obstacle1_move = 1
 obstacle2_move = -1
 
 obstacle_vertical_speed = 0.7
-moving_obstacles_start = 5
+
+level = 1
+
+level1_gap = 180
+level2_gap = 180
+level3_gap = 160
+level4_gap = 145
 
 score = 0
 high_score = 0
@@ -111,6 +117,10 @@ while running:
                     obstacle1_x = 800
                     obstacle2_x = 1250
 
+                    level = 1
+                    gap = level1_gap
+                    obstacle_vertical_speed = 0.7
+
                     top1 = random.randint(75, 375)
                     bottom1 = top1 + gap
 
@@ -175,9 +185,29 @@ while running:
 
     if game_over == False and game_state == playing:
 
+        if score < 5:
+             level = 1
+             gap = level1_gap
+             obstacle_vertical_speed = 0.7
+
+        elif score < 10:
+             level = 2
+             gap = level2_gap
+             obstacle_vertical_speed = 0.8
+
+        elif score < 15:
+             level = 3 
+             gap = level3_gap
+             obstacle_vertical_speed = 0.8
+
+        else:
+             level = 4
+             gap = level4_gap
+             obstacle_vertical_speed = 1.0
+
         boat_speed = boat_speed + gravity
 
-        if boat_speed > boat_speed + gravity:
+        if boat_speed > max_fall_speed:
              boat_speed = max_fall_speed
 
         boat_y = boat_y + boat_speed
@@ -185,7 +215,7 @@ while running:
         obstacle1_x = obstacle1_x - obstacle_speed
         obstacle2_x = obstacle2_x - obstacle_speed
 
-        if score >= moving_obstacles_start:
+        if level >= 2:
 
             top1 = top1 + obstacle1_move * obstacle_vertical_speed
 
@@ -199,8 +229,6 @@ while running:
 
                  obstacle1_move = 1
 
-            bottom1 = top1 + gap
-
             top2 = top2 + obstacle2_move * obstacle_vertical_speed
 
             if top2 >= 375:
@@ -211,7 +239,8 @@ while running:
                  top2 = 75
                  obstacle2_move = 1
 
-            bottom2 = top2 + gap
+        bottom1 = top1 + gap
+        bottom2 = top2 + gap
 
         wave_offset = wave_offset + obstacle_speed
 
@@ -234,7 +263,7 @@ while running:
             if random.randint(1,100) <= 3:
                 treasure_active = True
                 treasure_x = width + 50
-                treasure_y = random.randint(100, 500)
+                treasure_y = random.randint(100, 300)
                 treasure_timer = 0
 
         if treasure_active == True:
@@ -254,8 +283,15 @@ while running:
 
             obstacle_speed = 4 + score * 0.2
 
-            if obstacle_speed > 8:
-                 obstacle_speed = 8
+            if level == 4:
+
+                if obstacle_speed > 9:
+                    obstacle_speed = 9
+
+            else:
+
+                if obstacle_speed > 8:
+                    obstacle_speed = 8
 
         if obstacle2_x + obstacle_width < boat_x and passed2 == False:
             score = score + 1
@@ -266,8 +302,15 @@ while running:
 
             obstacle_speed = 4 + score * 0.2
 
-            if obstacle_speed > 8:
-                obstacle_speed = 8
+            if level == 4:
+
+                if obstacle_speed > 9:
+                    obstacle_speed = 9
+
+            else:
+                
+                if obstacle_speed > 8:
+                    obstacle_speed = 8
         
         if obstacle1_x < -obstacle_width:
 
@@ -560,15 +603,6 @@ while running:
               ),
               4
          )
-
-    if score >= moving_obstacles_start:
-         moving_text = small_font.render(
-              "MOVING!",
-              True,
-              (255,255,255)
-         )
-
-         screen.blit(moving_text, (380,80))
 
     score_text = font.render(
         str(score),
