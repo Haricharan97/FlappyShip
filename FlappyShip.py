@@ -25,6 +25,8 @@ boat_speed = 0
 gravity = 0.5
 jump = -8
 
+max_fall_speed = 10
+
 obstacle_width = 60
 obstacle_speed = 4
 
@@ -41,7 +43,7 @@ bottom2 = top2 + gap
 obstacle1_move = 1
 obstacle2_move = -1
 
-obstacle_vertical_speed = 1
+obstacle_vertical_speed = 0.7
 moving_obstacles_start = 5
 
 score = 0
@@ -60,14 +62,17 @@ coin2_x = obstacle2_x + obstacle_width // 2
 coin2_y = top2 + gap // 2
 
 coin3_x = (obstacle1_x + obstacle2_x) // 2
-coin3_y = 250
+
+gap1_middle = top1 + gap // 2
+gap2_middle = top2 + gap // 2
+coin3_y = (gap1_middle + gap2_middle) //2
 
 coin1_collected = False
 coin2_collected = False
 coin3_collected = False
 
 treasure_x = width + 100
-treasure_y = random.randint(100, 450)
+treasure_y = random.randint(100, 300)
 treasure_size = 28
 treasure_active = False
 treasure_timer = 0
@@ -127,8 +132,11 @@ while running:
                     coin2_x = (obstacle2_x + obstacle_width) // 2
                     coin2_y = top2 + gap // 2
 
+                    gap1_middle = top1 + gap // 2
+                    gap2_middle = top2 + gap // 2
+
                     coin3_x = (obstacle1_x + obstacle2_x) // 2
-                    coin3_y = 250
+                    coin3_y = (gap1_middle + gap2_middle) //2
 
                     coin1_collected = False
                     coin2_collected = False
@@ -138,7 +146,7 @@ while running:
                     treasure_timer = 0
 
                     treasure_x = width + 100
-                    treasure_y = random.randint(100,500)
+                    treasure_y = random.randint(100,300)
 
                     obstacle_speed = 4 
                     wave_offset = 0
@@ -168,6 +176,10 @@ while running:
     if game_over == False and game_state == playing:
 
         boat_speed = boat_speed + gravity
+
+        if boat_speed > boat_speed + gravity:
+             boat_speed = max_fall_speed
+
         boat_y = boat_y + boat_speed
 
         obstacle1_x = obstacle1_x - obstacle_speed
@@ -176,44 +188,44 @@ while running:
         if score >= moving_obstacles_start:
 
             top1 = top1 + obstacle1_move * obstacle_vertical_speed
-            bottom1 = top1 + gap
 
             if top1 >= 375:
 
                 top1 = 375
-
                 obstacle1_move = -1
 
-            if top1 <= 75:
+            elif top1 <= 75:
                  top1 = 75
 
                  obstacle1_move = 1
 
             bottom1 = top1 + gap
 
+            top2 = top2 + obstacle2_move * obstacle_vertical_speed
+
             if top2 >= 375:
                  top2 = 375
                  obstacle2_move = -1
 
-            if top2 <= 75:
+            elif top2 <= 75:
                  top2 = 75
                  obstacle2_move = 1
 
-                 bottom2 = top2 + gap
+            bottom2 = top2 + gap
 
         wave_offset = wave_offset + obstacle_speed
 
         coin1_x = obstacle1_x + obstacle_width // 2
         coin2_x = obstacle2_x + obstacle_width // 2
-        coin3_x = coin3_x - obstacle_speed
+        coin3_x = (obstacle1_x + obstacle2_x) // 2
 
         coin1_y = top1 + gap // 2
         coin2_y = top2 + gap // 2
 
-        if coin3_x < -coin_size:
-             coin3_x = width + 250
-             coin3_y = random.randint(120, 480)
-             coin3_collected = False
+        gap1_middle = top1 + gap // 2
+        gap2_middle = top2 + gap // 2
+
+        coin3_y = (gap1_middle + gap2_middle) // 2
 
         treasure_timer = treasure_timer + 1
 
@@ -232,29 +244,30 @@ while running:
                  treasure_active = False
                  treasure_timer = 0
 
-        if obstacle1_x < boat_x and passed1 == False:
+        if obstacle1_x + obstacle_width < boat_x and passed1 == False:
+
             score = score + 1
             passed1 = True
 
             if score > high_score:
-                 high_score = score
+                  high_score = score
 
             obstacle_speed = 4 + score * 0.2
 
             if obstacle_speed > 8:
                  obstacle_speed = 8
 
-        if obstacle2_x < boat_x and passed2 == False:
+        if obstacle2_x + obstacle_width < boat_x and passed2 == False:
             score = score + 1
             passed2 = True
 
             if score > high_score:
-                 high_score = score
+                high_score = score
 
             obstacle_speed = 4 + score * 0.2
 
             if obstacle_speed > 8:
-                 obstacle_speed = 8
+                obstacle_speed = 8
         
         if obstacle1_x < -obstacle_width:
 
@@ -269,6 +282,8 @@ while running:
             coin1_collected = False
 
             obstacle1_move = random.choice([-1,1])
+
+            coin3_collected = False
 
         if obstacle2_x < -obstacle_width:
 
@@ -353,32 +368,34 @@ while running:
         if boat_y < 0:
             game_over = True
 
-        if boat_y + boat_height>= height:
+        elif boat_y + boat_height>= height:
              game_over = True
 
-        if boat_rect.colliderect(top_rect1) or boat_rect.colliderect(bottom_rect1):
+        elif boat_rect.colliderect(top_rect1) or boat_rect.colliderect(bottom_rect1):
             game_over = True
 
-        if boat_rect.colliderect(top_rect2) or boat_rect.colliderect(bottom_rect2):
+        elif boat_rect.colliderect(top_rect2) or boat_rect.colliderect(bottom_rect2):
             game_over = True
 
-        if boat_rect.colliderect(coin1_rect) and coin1_collected == False:
-             coins = coins + 1
-             coin1_collected = True
+        if game_over == False:
 
-        if boat_rect.colliderect(coin2_rect) and coin2_collected == False:
-             coins = coins + 1
-             coin2_collected = True
+            if boat_rect.colliderect(coin1_rect) and coin1_collected == False:
+                coins = coins + 1
+                coin1_collected = True
 
-        if boat_rect.colliderect(coin3_rect) and coin3_collected == False:
-             coins = coins + 1
-             coin3_collected = True
+            if boat_rect.colliderect(coin2_rect) and coin2_collected == False:
+                coins = coins + 1
+                coin2_collected = True
 
-        if treasure_active == True:
-             if boat_rect.colliderect(treasure_rect):
-                  coins = coins + 5
-                  treasure_active = False
-                  treasure_timer = 0
+            if boat_rect.colliderect(coin3_rect) and coin3_collected == False:
+                coins = coins + 1
+                coin3_collected = True
+
+            if treasure_active == True:
+                if boat_rect.colliderect(treasure_rect):
+                    coins = coins + 5
+                    treasure_active = False
+                    treasure_timer = 0
 
     screen.fill((70,150,220))
 
