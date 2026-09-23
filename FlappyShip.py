@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 pygame.init()
 
@@ -24,8 +25,6 @@ boat_speed = 0
 gravity = 0.5
 jump = -8
 
-obstacle_x = 800
-
 obstacle_width = 60
 obstacle_speed = 4
 
@@ -42,6 +41,10 @@ bottom2 = top2 + gap
 score = 0
 passed1 = False
 passed2 = False
+
+wave_offset = 0
+
+water = 360
 
 game_over = False
 
@@ -83,10 +86,8 @@ while running:
                     passed1 = False
                     passed2 = False
 
-                    game_over = False
-                    game_state = playing
-
                     obstacle_speed = 4 
+                    wave_offset = 0
 
                     game_over = False
                     game_state = playing
@@ -117,6 +118,8 @@ while running:
 
         obstacle1_x = obstacle1_x - obstacle_speed
         obstacle2_x = obstacle2_x - obstacle_speed
+
+        wave_offset = wave_offset + obstacle_speed
 
         if obstacle1_x < boat_x and passed1 == False:
             score = score + 1
@@ -195,8 +198,8 @@ while running:
         if boat_y < 0:
             game_over = True
 
-        if boat_y + boat_height >= height:
-            game_over = True
+        if boat_y + boat_height>= height:
+             game_over = True
 
         if boat_rect.colliderect(top_rect1) or boat_rect.colliderect(bottom_rect1):
             game_over = True
@@ -205,6 +208,80 @@ while running:
             game_over = True
 
     screen.fill((70,150,220))
+
+    back_points = [(0, height)]
+
+    for i in range(0, width + 10, 10):
+
+         wave_y = (
+              water
+              + math.sin((i + wave_offset)*0.02)*15
+              +math.sin((i + wave_offset)*0.04)*8
+         )
+
+         back_points.append((i, wave_y + 40))
+
+    back_points.append((width, height))
+
+    pygame.draw.polygon(
+         screen,
+         (8,55,82),
+         back_points
+    )
+
+    middle_points = [(0,height)]
+
+    for i in range(0, width +10, 10):
+
+         wave_y = (
+              water
+              + math.sin((i + wave_offset) * 0.02) * 15
+              + math.sin((i + wave_offset) * 0.04) * 8
+         )
+
+         middle_points.append((i, wave_y + 20))
+
+    middle_points.append((width, height))
+
+    pygame.draw.polygon(
+         screen,
+         (10, 91, 120),
+         middle_points
+    )
+
+    front_points = [(0, height)]
+
+    for i in range(0, width + 10, 10):
+
+         wave_y = (
+              water
+              + math.sin((i + wave_offset) * 0.02) * 15
+              +math.sin((i + wave_offset) * 0.04) * 8
+         )
+
+         front_points.append((i, wave_y))
+
+    front_points.append((width, height))
+
+    pygame.draw.polygon(
+         screen,
+         (35,135,157),
+         front_points
+    )
+
+    for i in range(0, width, 30):
+
+         wave_y = (
+              water
+              + math.sin((i + wave_offset) * 0.02) * 15
+              +math.sin((i + wave_offset) * 0.04) * 8
+         )
+
+         pygame.draw.rect(
+              screen,
+              (115, 205, 204),
+              (i, wave_y, 15, 5)
+         )
 
     pygame.draw.rect(
             screen,
@@ -278,24 +355,17 @@ while running:
         screen.blit(paused_text, (290, 220))
         screen.blit(continue_text, (245, 310))
 
-        if game_over == True:
+    if game_over == True:
 
-            text = font.render(
+        text = font.render(
                 "GAME OVER",
                 True,
                 (255, 255, 255)
             )
 
-    if game_over == True:
-        text = font.render(
-            "GAME OVER",
-            True,
-            (255,255,255)
-        )
-
         restart_text = small_font.render(
-            "PRESS ENTER TO RESTART",
-            True,
+                "PRESS ENTER TO RESTART",
+             True,
             (255, 255, 255)
         )
 
