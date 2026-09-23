@@ -30,11 +30,17 @@ obstacle_speed = 4
 
 gap = 180
 
-top_obstacle = 180
-bottom_obstacle = top_obstacle + gap
+obstacle1_x = 800
+top1 = random.randint(75, 375)
+bottom1 = top1 + gap
+
+obstacle2_x = 1250
+top2 = random.randint(75, 375)
+bottom2 = top2 + gap
 
 score = 0
-passed = False
+passed1 = False
+passed2 = False
 
 game_over = False
 
@@ -58,19 +64,35 @@ while running:
         boat_speed = boat_speed + gravity
         boat_y = boat_y + boat_speed
 
-        obstacle_x = obstacle_x - obstacle_speed
+        obstacle1_x = obstacle1_x - obstacle_speed
+        obstacle2_x = obstacle2_x - obstacle_speed
 
-        if obstacle_x + obstacle_width < boat_x and passed == False:
+        if obstacle1_x < boat_x and passed1 == False:
             score = score + 1
-            passed = True
-        
-        if obstacle_x < -obstacle_width:
-            obstacle_x = width
-        
-            top_obstacle = random.randint(75, 375)
-            bottom_obstacle = top_obstacle + gap
+            passed1 = True
 
-            passed = False
+        if obstacle2_x < boat_x and passed2 == False:
+            score = score + 1
+            passed2 = True
+        
+        if obstacle1_x < -obstacle_width:
+
+            obstacle1_x = obstacle2_x + 600
+
+            top1 = random.randint(75, 375)
+            bottom1 = top1 + gap
+
+            passed1 = False
+
+        if obstacle2_x < -obstacle_width:
+
+            obstacle2_x = obstacle1_x + 600
+
+            top2 = random.randint(75, 375)
+            bottom2 = top2 + gap
+
+            passed2 = False
+
 
     boat_rect = pygame.Rect(
          boat_x,
@@ -79,18 +101,32 @@ while running:
          boat_height
     )
 
-    top_rect = pygame.Rect(
-        obstacle_x,
+    top_rect1 = pygame.Rect(
+        obstacle1_x,
         0,
         obstacle_width,
-        top_obstacle
+        top1
     )
 
-    bottom_rect = pygame.Rect(
-        obstacle_x,
-        bottom_obstacle,
+    bottom_rect1 = pygame.Rect(
+        obstacle1_x,
+        bottom1,
         obstacle_width,
-        height - bottom_obstacle
+        height - bottom1
+    )
+
+    top_rect2 = pygame.Rect(
+        obstacle2_x,
+        0,
+        obstacle_width,
+        top2
+    )
+
+    bottom_rect2 = pygame.Rect(
+        obstacle2_x,
+        bottom2,
+        obstacle_width,
+        height - bottom2
     )
 
     if boat_y < 0:
@@ -99,7 +135,10 @@ while running:
     if boat_y + boat_height >= height:
         game_over = True
 
-    if boat_rect.colliderect(top_rect) or boat_rect.colliderect(bottom_rect):
+    if boat_rect.colliderect(top_rect1) or boat_rect.colliderect(bottom_rect1):
+        game_over = True
+
+    if boat_rect.colliderect(top_rect2) or boat_rect.colliderect(bottom_rect2):
         game_over = True
 
     screen.fill((70,150,220))
@@ -113,13 +152,25 @@ while running:
     pygame.draw.rect(
          screen,
          (80,80,80),
-         (obstacle_x, 0, obstacle_width, top_obstacle)
+         (obstacle1_x, 0, obstacle_width, top1)
     )
 
     pygame.draw.rect(
          screen,
          (80,80,80),
-         (obstacle_x, bottom_obstacle, obstacle_width, height - bottom_obstacle)
+         (obstacle1_x, bottom1, obstacle_width, height - bottom1)
+    )
+
+    pygame.draw.rect(
+        screen,
+        (80, 80, 80),
+        (obstacle2_x, 0, obstacle_width, top2)
+    )
+
+    pygame.draw.rect(
+        screen,
+        (80, 80, 80),
+        (obstacle2_x, bottom2, obstacle_width, height - bottom2)
     )
 
     score_text = font.render(
