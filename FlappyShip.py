@@ -63,27 +63,47 @@ while running:
 
         if event.type == pygame.KEYDOWN:
 
-            if game_state == start:
+            if game_over == True:
 
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_RETURN:
+
+                    boat_y = 300
+                    boat_speed = 0
+
+                    obstacle1_x = 800
+                    obstacle2_x = 1250
+
+                    top1 = random.randint(75, 375)
+                    bottom1 = top1 + gap
+
+                    top2 = random.randint(75, 375)
+                    bottom2 = top2 + gap
+
+                    score = 0
+                    passed1 = False
+                    passed2 = False
+
+                    game_over = False
                     game_state = playing
-                    boat_speed = jump
+
+            elif game_state == start:
+
+                    if event.key == pygame.K_SPACE:
+                        game_state = playing
+                        boat_speed = jump
 
             elif game_state == playing:
 
-                if game_over == False:
+                        if event.key == pygame.K_SPACE:
+                            boat_speed = jump
 
-                    if event.key == pygame.K_SPACE:
-                        boat_speed = jump
-
-                    if event.key == pygame.K_ESCAPE:
-                        game_state = paused
- 
+                        if event.key == pygame.K_ESCAPE:
+                            game_state = paused
+    
             elif game_state == paused:
-                if game_over == False:
 
-                    if event.key == pygame.K_ESCAPE:
-                        game_state = playing
+                        if event.key == pygame.K_ESCAPE:
+                            game_state = playing
 
     if game_over == False and game_state == playing:
 
@@ -243,6 +263,14 @@ while running:
         screen.blit(paused_text, (290, 220))
         screen.blit(continue_text, (245, 310))
 
+        if game_over == True:
+
+            text = font.render(
+                "GAME OVER",
+                True,
+                (255, 255, 255)
+            )
+
     if game_over == True:
         text = font.render(
             "GAME OVER",
@@ -250,7 +278,14 @@ while running:
             (255,255,255)
         )
 
+        restart_text = small_font.render(
+            "PRESS ENTER TO RESTART",
+            True,
+            (255, 255, 255)
+        )
+
         screen.blit(text, (240,250))
+        screen.blit(restart_text, (220, 320))
 
     pygame.display.flip()
 
