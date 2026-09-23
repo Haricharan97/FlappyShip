@@ -38,6 +38,12 @@ obstacle2_x = 1250
 top2 = random.randint(75, 375)
 bottom2 = top2 + gap
 
+obstacle1_move = 1
+obstacle2_move = -1
+
+obstacle_vertical_speed = 1
+moving_obstacles_start = 5
+
 score = 0
 high_score = 0
 passed1 = False
@@ -106,6 +112,9 @@ while running:
                     top2 = random.randint(75, 375)
                     bottom2 = top2 + gap
 
+                    obstacle1_move = 1
+                    obstacle2_move = -1
+
                     score = 0
                     passed1 = False
                     passed2 = False
@@ -164,11 +173,42 @@ while running:
         obstacle1_x = obstacle1_x - obstacle_speed
         obstacle2_x = obstacle2_x - obstacle_speed
 
+        if score >= moving_obstacles_start:
+
+            top1 = top1 + obstacle1_move * obstacle_vertical_speed
+            bottom1 = top1 + gap
+
+            if top1 >= 375:
+
+                top1 = 375
+
+                obstacle1_move = -1
+
+            if top1 <= 75:
+                 top1 = 75
+
+                 obstacle1_move = 1
+
+            bottom1 = top1 + gap
+
+            if top2 >= 375:
+                 top2 = 375
+                 obstacle2_move = -1
+
+            if top2 <= 75:
+                 top2 = 75
+                 obstacle2_move = 1
+
+                 bottom2 = top2 + gap
+
         wave_offset = wave_offset + obstacle_speed
 
         coin1_x = obstacle1_x + obstacle_width // 2
         coin2_x = obstacle2_x + obstacle_width // 2
         coin3_x = coin3_x - obstacle_speed
+
+        coin1_y = top1 + gap // 2
+        coin2_y = top2 + gap // 2
 
         if coin3_x < -coin_size:
              coin3_x = width + 250
@@ -228,6 +268,8 @@ while running:
             coin1_y = top1 + gap // 2
             coin1_collected = False
 
+            obstacle1_move = random.choice([-1,1])
+
         if obstacle2_x < -obstacle_width:
 
             obstacle2_x = obstacle1_x + 600
@@ -239,6 +281,8 @@ while running:
 
             coin2_y = top2 + gap // 2
             coin2_collected = False
+
+            obstacle2_move = random.choice([-1,1])
 
 
     boat_rect = pygame.Rect(
@@ -499,6 +543,15 @@ while running:
               ),
               4
          )
+
+    if score >= moving_obstacles_start:
+         moving_text = small_font.render(
+              "MOVING!",
+              True,
+              (255,255,255)
+         )
+
+         screen.blit(moving_text, (380,80))
 
     score_text = font.render(
         str(score),
