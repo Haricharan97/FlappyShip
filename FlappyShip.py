@@ -42,6 +42,19 @@ score = 0
 passed1 = False
 passed2 = False
 
+coins = 0
+
+coin_size = 20
+
+coin1_x = obstacle1_x + obstacle_width // 2
+coin1_y = top1 + gap // 2
+
+coin2_x = obstacle2_x + obstacle_width // 2
+coin2_y = top2 + gap // 2
+
+coin1_collected = False
+coin2_collected = False
+
 wave_offset = 0
 
 water = 360
@@ -86,6 +99,14 @@ while running:
                     passed1 = False
                     passed2 = False
 
+                    coins = 0
+
+                    coin1_y = top1 + gap // 2
+                    coin2_y = top2 + gap // 2
+
+                    coin1_collected = False
+                    coin2_collected = False
+
                     obstacle_speed = 4 
                     wave_offset = 0
 
@@ -121,6 +142,9 @@ while running:
 
         wave_offset = wave_offset + obstacle_speed
 
+        coin1_x = obstacle1_x + obstacle_width // 2
+        coin2_x = obstacle2_x + obstacle_width // 2
+
         if obstacle1_x < boat_x and passed1 == False:
             score = score + 1
             passed1 = True
@@ -148,6 +172,9 @@ while running:
 
             passed1 = False
 
+            coin1_y = top1 + gap // 2
+            coin1_collected = False
+
         if obstacle2_x < -obstacle_width:
 
             obstacle2_x = obstacle1_x + 600
@@ -156,6 +183,9 @@ while running:
             bottom2 = top2 + gap
 
             passed2 = False
+
+            coin2_y = top2 + gap // 2
+            coin2_collected = False
 
 
     boat_rect = pygame.Rect(
@@ -193,6 +223,20 @@ while running:
         height - bottom2
     )
 
+    coin1_rect = pygame.Rect(
+         coin1_x - coin_size // 2,
+         coin1_y - coin_size //2,
+         coin_size,
+         coin_size
+    )
+
+    coin2_rect = pygame.Rect(
+        coin2_x - coin_size // 2,
+        coin2_y - coin_size //2,
+        coin_size,
+        coin_size
+    )
+
     if game_state == playing and game_over == False:
 
         if boat_y < 0:
@@ -206,6 +250,14 @@ while running:
 
         if boat_rect.colliderect(top_rect2) or boat_rect.colliderect(bottom_rect2):
             game_over = True
+
+        if boat_rect.colliderect(coin1_rect) and coin1_collected == False:
+             coins = coins + 1
+             coin1_collected = True
+
+        if boat_rect.colliderect(coin2_rect) and coin2_collected == False:
+             coins = coins + 1
+             coin2_collected = True
 
     screen.fill((70,150,220))
 
@@ -313,6 +365,24 @@ while running:
         (obstacle2_x, bottom2, obstacle_width, height - bottom2)
     )
 
+    if coin1_collected == False:
+
+         pygame.draw.circle(
+              screen,
+              (255, 220, 0),
+              (int(coin1_x), int(coin1_y)),
+              10
+         )
+
+    if coin2_collected == False:
+
+         pygame.draw.circle(
+              screen,
+              (255, 220, 0),
+              (int(coin2_x), int(coin2_y)),
+              10
+         )
+
     score_text = font.render(
         str(score),
         True,
@@ -320,6 +390,14 @@ while running:
     )
 
     screen.blit(score_text, (380, 30))
+
+    coin_text = small_font.render(
+         "Coins: " + str(coins),
+         True,
+         (255, 220, 0)
+    )
+
+    screen.blit(coin_text, (20,20))
 
     if game_state == start:
 
