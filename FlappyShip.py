@@ -10,6 +10,8 @@ screen = pygame.display.set_mode((width,height))
 
 clock = pygame.time.Clock()
 
+font = pygame.font.Font(None, 70)
+
 boat_x = 150
 boat_y = 300
 
@@ -30,6 +32,9 @@ gap = 180
 
 top_obstacle = 180
 bottom_obstacle = top_obstacle + gap
+
+score = 0
+passed = False
 
 game_over = False
 
@@ -53,27 +58,19 @@ while running:
         boat_speed = boat_speed + gravity
         boat_y = boat_y + boat_speed
 
-        if boat_y < 0:
-            boat_y = 0
-            boat_speed = 0
-
-        if boat_y  > height - boat_height:
-            boat_y = height - boat_height
-            boat_speed = 0
-
         obstacle_x = obstacle_x - obstacle_speed
 
-        if obstacle_x < obstacle_width:
+        if obstacle_x + obstacle_width < boat_x and passed == False:
+            score = score + 1
+            passed = True
+        
+        if obstacle_x < -obstacle_width:
             obstacle_x = width
-
+        
             top_obstacle = random.randint(75, 375)
             bottom_obstacle = top_obstacle + gap
 
-    if boat_y < 0:
-         boat_y = 0
-
-    if boat_y > height - boat_height:
-         boat_y = height - boat_height
+            passed = False
 
     boat_rect = pygame.Rect(
          boat_x,
@@ -95,6 +92,12 @@ while running:
         obstacle_width,
         height - bottom_obstacle
     )
+
+    if boat_y < 0:
+         game_over = True
+
+    if boat_y + boat_height >= height:
+        game_over = True
 
     if boat_rect.colliderect(top_rect) or boat_rect.colliderect(bottom_rect):
         game_over = True
@@ -119,9 +122,18 @@ while running:
          (obstacle_x, bottom_obstacle, obstacle_width, height - bottom_obstacle)
     )
 
+    score_text = font.render(
+        str(score),
+        True,
+        ( 255, 255, 255)
+    )
+
+    screen.blit(score_text, (380, 30))
+
     if game_over == True:
-        text = pygame.font.render(
+        text = font.render(
             "GAME OVER",
+            True,
             (255,255,255)
         )
 
@@ -129,4 +141,4 @@ while running:
 
     pygame.display.flip()
 
-pygame.quit
+pygame.quit()
