@@ -11,6 +11,7 @@ screen = pygame.display.set_mode((width,height))
 clock = pygame.time.Clock()
 
 font = pygame.font.Font(None, 70)
+small_font = pygame.font.Font(None, 40)
 
 boat_x = 150
 boat_y = 300
@@ -44,6 +45,12 @@ passed2 = False
 
 game_over = False
 
+start = 0
+playing = 1
+paused = 2
+
+game_state = start
+
 running = True
 
 while running:
@@ -56,10 +63,29 @@ while running:
 
         if event.type == pygame.KEYDOWN:
 
-            if event.key == pygame.K_SPACE:
-                boat_speed = jump
+            if game_state == start:
 
-    if game_over == False:
+                if event.key == pygame.K_SPACE:
+                    game_state = playing
+                    boat_speed = jump
+
+            elif game_state == playing:
+
+                if game_over == False:
+
+                    if event.key == pygame.K_SPACE:
+                        boat_speed = jump
+
+                    if event.key == pygame.K_ESCAPE:
+                        game_state = paused
+ 
+            elif game_state == paused:
+                if game_over == False:
+
+                    if event.key == pygame.K_ESCAPE:
+                        game_state = playing
+
+    if game_over == False and game_state == playing:
 
         boat_speed = boat_speed + gravity
         boat_y = boat_y + boat_speed
@@ -129,17 +155,19 @@ while running:
         height - bottom2
     )
 
-    if boat_y < 0:
-         game_over = True
+    if game_state == playing and game_over == False:
 
-    if boat_y + boat_height >= height:
-        game_over = True
+        if boat_y < 0:
+            game_over = True
 
-    if boat_rect.colliderect(top_rect1) or boat_rect.colliderect(bottom_rect1):
-        game_over = True
+        if boat_y + boat_height >= height:
+            game_over = True
 
-    if boat_rect.colliderect(top_rect2) or boat_rect.colliderect(bottom_rect2):
-        game_over = True
+        if boat_rect.colliderect(top_rect1) or boat_rect.colliderect(bottom_rect1):
+            game_over = True
+
+        if boat_rect.colliderect(top_rect2) or boat_rect.colliderect(bottom_rect2):
+            game_over = True
 
     screen.fill((70,150,220))
 
@@ -180,6 +208,40 @@ while running:
     )
 
     screen.blit(score_text, (380, 30))
+
+    if game_state == start:
+
+        title = font.render(
+            "FLAPPY SHIP",
+            True,
+            (255, 255, 255)
+        )
+
+        start_text = small_font.render(
+            "PRESS SPACE TO START",
+            True,
+            (255, 255, 255)
+        )
+
+        screen.blit(title, (250,220))
+        screen.blit(start_text, (245, 310))
+
+    if game_state == paused:
+
+        paused_text = font.render(
+            "PAUSED",
+            True,
+            (255, 255, 255)
+        )
+
+        continue_text = small_font.render(
+            "PRESS ESC TO CONTINUE",
+            True,
+            (255, 255, 255)
+        )
+
+        screen.blit(paused_text, (290, 220))
+        screen.blit(continue_text, (245, 310))
 
     if game_over == True:
         text = font.render(
