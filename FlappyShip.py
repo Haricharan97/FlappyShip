@@ -86,6 +86,11 @@ while running:
                     game_over = False
                     game_state = playing
 
+                    obstacle_speed = 4 
+
+                    game_over = False
+                    game_state = playing
+
             elif game_state == start:
 
                     if event.key == pygame.K_SPACE:
@@ -117,9 +122,19 @@ while running:
             score = score + 1
             passed1 = True
 
+            obstacle_speed = 4 + score * 0.2
+
+            if obstacle_speed > 8:
+                 obstacle_speed = 8
+
         if obstacle2_x < boat_x and passed2 == False:
             score = score + 1
             passed2 = True
+
+            obstacle_speed = 4 + score * 0.2
+
+            if obstacle_speed > 8:
+                 obstacle_speed = 8
         
         if obstacle1_x < -obstacle_width:
 
