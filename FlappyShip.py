@@ -61,30 +61,75 @@ coins = 0
 
 coin_size = 20
 
-coin1_x = obstacle1_x + obstacle_width // 2
-coin1_y = top1 + gap // 2
+coin_gap = 190
+coin_margin = 35
+coin_list = []
 
-coin2_x = obstacle2_x + obstacle_width // 2
-coin2_y = top2 + gap // 2
+def coin_blocked(x):
 
-coin3_x = (obstacle1_x + obstacle2_x) // 2
+    clr = coin_size // 2 + 25
+    l1 = obstacle1_x - clr
+    r1 = obstacle1_x + obstacle_width + clr
+    l2 = obstacle2_x - clr
+    r2 = obstacle2_x + obstacle_width + clr
 
-gap1_middle = top1 + gap // 2
-gap2_middle = top2 + gap // 2
-coin3_y = (gap1_middle + gap2_middle) //2
+    return (
+         l1 <= x <= r1
+         or
+         l2 <= x <= r2
+    )
 
-coin1_collected = False
-coin2_collected = False
-coin3_collected = False
+def safe_x(x):
+     clr = coin_size // 2 + 25
+
+     if obstacle1_x - clr <= x <= obstacle1_x + obstacle_width + clr:
+          x = obstacle1_x + obstacle_width + clr
+
+     if obstacle2_x - clr <= x <= obstacle2_x + obstacle_width + clr:
+          x = obstacle2_x + obstacle_width + clr
+
+     return x
+
+def near_obs(x):
+     if abs(x - obstacle1_x) <= abs(x - obstacle2_x):
+          return 1
+
+     return 2
+
+def coin_y(obs, frac):
+     if obs == 1:
+          gt = top1
+          gb = bottom1
+     else:
+          gt = top2
+          gb = bottom2
+
+     st = gt + coin_size // 2 + 12
+     sb = gb - coin_size // 2 - 12
+
+     if sb > st:
+          return st + frac * (sb - st)
+
+     return (gt + gb) / 2
+
+
+def create_initial_coins():
+    coin_list = []
+
+    for i in range(8):
+        x = width + 150 + i * coin_spacing
+        coin_list.append(spawn_coin(x))
+
+    return coin_list
+
+coin_list = create_initial_coins()
 
 treasure_x = width + 100
 treasure_y = random.randint(100, 300)
 treasure_size = 28
 treasure_active = False
 treasure_timer = 0
-
 wave_offset = 0
-
 water = 360
 
 game_over = False
@@ -136,21 +181,7 @@ while running:
 
                     coins = 0
 
-                    coin1_x = (obstacle1_x + obstacle_width) // 2
-                    coin1_y = top1 + gap // 2
-
-                    coin2_x = (obstacle2_x + obstacle_width) // 2
-                    coin2_y = top2 + gap // 2
-
-                    gap1_middle = top1 + gap // 2
-                    gap2_middle = top2 + gap // 2
-
-                    coin3_x = (obstacle1_x + obstacle2_x) // 2
-                    coin3_y = (gap1_middle + gap2_middle) //2
-
-                    coin1_collected = False
-                    coin2_collected = False
-                    coin3_collected = False
+                    coin_list = create_initial_coins()
 
                     treasure_active = False
                     treasure_timer = 0
@@ -244,17 +275,20 @@ while running:
 
         wave_offset = wave_offset + obstacle_speed
 
-        coin1_x = obstacle1_x + obstacle_width // 2
-        coin2_x = obstacle2_x + obstacle_width // 2
-        coin3_x = (obstacle1_x + obstacle2_x) // 2
+        for coin in coin_list:
+             coin[0] -= obstacle_speed
 
-        coin1_y = top1 + gap // 2
-        coin2_y = top2 + gap // 2
+        for coin in coin_list:
+             if coin[0] < -coin_size:
+                rightmost_x = max(c[0] for c in coin_list)
 
-        gap1_middle = top1 + gap // 2
-        gap2_middle = top2 + gap // 2
+                new_coin = spawn_coin(
+                     rightmost_x + coin_spacing
+                )
 
-        coin3_y = (gap1_middle + gap2_middle) // 2
+                coin[0] = new_coin[0]
+                coin[1] = new_coin[1]
+                coin[2] = False
 
         treasure_timer = treasure_timer + 1
 
@@ -321,12 +355,7 @@ while running:
 
             passed1 = False
 
-            coin1_y = top1 + gap // 2
-            coin1_collected = False
-
             obstacle1_move = random.choice([-1,1])
-
-            coin3_collected = False
 
         if obstacle2_x < -obstacle_width:
 
@@ -336,9 +365,6 @@ while running:
             bottom2 = top2 + gap
 
             passed2 = False
-
-            coin2_y = top2 + gap // 2
-            coin2_collected = False
 
             obstacle2_move = random.choice([-1,1])
 
@@ -378,27 +404,15 @@ while running:
         height - bottom2
     )
 
-    coin1_rect = pygame.Rect(
-         coin1_x - coin_size // 2,
-         coin1_y - coin_size //2,
-         coin_size,
-         coin_size
-    )
-
-    coin2_rect = pygame.Rect(
-        coin2_x - coin_size // 2,
-        coin2_y - coin_size //2,
-        coin_size,
-        coin_size
-    )
-
-    coin3_rect = pygame.Rect(
-        coin3_x - coin_size // 2,
-        coin3_y - coin_size //2,
-        coin_size,
-        coin_size
-    )
-
+    for coin in coin_list:
+         if not coin[2]:
+              pygame.draw.circle(
+                    screen,
+                    (255, 220, 0),
+                    (int(coin[0]), int(coin[1])),
+                    coin_radius
+                )
+              
     treasure_rect = pygame.Rect(
          treasure_x - treasure_size // 2,
          treasure_y - treasure_size // 2,
@@ -422,17 +436,18 @@ while running:
 
         if game_over == False:
 
-            if boat_rect.colliderect(coin1_rect) and coin1_collected == False:
-                coins = coins + 1
-                coin1_collected = True
+            for coin in coin_list:
+                if not coin[2]:
+                    coin_rect = pygame.Rect(
+                        int(coin[0] - coin_radius),
+                        int(coin[1] - coin_radius),
+                        coin_size,
+                        coin_size
+                    )
 
-            if boat_rect.colliderect(coin2_rect) and coin2_collected == False:
-                coins = coins + 1
-                coin2_collected = True
-
-            if boat_rect.colliderect(coin3_rect) and coin3_collected == False:
-                coins = coins + 1
-                coin3_collected = True
+                    if boat_rect.colliderect(coin_rect):
+                        coin += 1
+                        coin[2] = True
 
             if treasure_active == True:
                 if boat_rect.colliderect(treasure_rect):
@@ -449,7 +464,7 @@ while running:
          wave_y = (
               water
               + math.sin((i + wave_offset)*0.02)*15
-              +math.sin((i + wave_offset)*0.04)*8
+              + math.sin((i + wave_offset)*0.04)*8
          )
 
          back_points.append((i, wave_y + 40))
@@ -545,33 +560,6 @@ while running:
         (80, 80, 80),
         (obstacle2_x, bottom2, obstacle_width, height - bottom2)
     )
-
-    if coin1_collected == False:
-
-         pygame.draw.circle(
-              screen,
-              (255, 220, 0),
-              (int(coin1_x), int(coin1_y)),
-              10
-         )
-
-    if coin2_collected == False:
-
-         pygame.draw.circle(
-              screen,
-              (255, 220, 0),
-              (int(coin2_x), int(coin2_y)),
-              10
-         )
-
-    if coin3_collected == False:
-
-         pygame.draw.circle(
-              screen,
-              (255, 220, 0),
-              (int(coin3_x), int(coin3_y)),
-              10
-         )
 
     if treasure_active == True:
          pygame.draw.circle(
@@ -682,3 +670,4 @@ while running:
     pygame.display.flip()
 
 pygame.quit()
+
