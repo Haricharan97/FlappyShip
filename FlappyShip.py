@@ -731,6 +731,7 @@ while running:
          ],
          1
     )
+
     pygame.draw.rect(
          screen,
          (80,80,80),
@@ -758,12 +759,53 @@ while running:
     for coin_x, coin_y_pos, coin_obs, coin_frac in coin_list:
          pygame.draw.circle(
               screen,
-              (255, 220, 0),
+              (150, 90, 0),
               (
                    int(coin_x),
                    int(coin_y_pos)
               ),
-              10
+              coin_size // 2
+
+         )
+
+         pygame.draw.circle(
+              screen,
+              (255, 190, 0),
+              (
+                   int(coin_x),
+                   int(coin_y_pos)
+              ),
+              coin_size // 2 - 2
+         )
+
+         pygame.draw.circle(
+              screen,
+              (255, 220, 70),
+              (
+                   int(coin_x),
+                   int(coin_y_pos)
+              ),
+              coin_size // 2 - 5
+         )
+
+         pygame.draw.circle(
+              screen,
+              (210, 140, 0),
+              (
+                   int(coin_x),
+                   int(coin_y_pos)
+              ),
+              3
+         )
+
+         pygame.draw.circle(
+              screen,
+              (255, 255, 210),
+              (
+                   int(coin_x - 3),
+                   int(coin_y_pos - 3)
+              ),
+              2
          )
 
     if treasure_active == True:
