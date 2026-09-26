@@ -96,6 +96,18 @@ def near_obs(x):
 
      return 2
 
+def draw_ruin_pillar(screen, x, y, w, h, broker_edge):
+     if h <= 0:
+          return
+
+     stone = (95, 92, 82)
+     stone_dark = (70, 68, 60)
+     stone_light = (115, 112, 100)
+     algae = (60, 110, 70)
+     algae_dark = (40, 85, 55)
+
+     pygame.draw.rect(screen, stone, (x, y, w, h))
+
 def coin_y(obs, frac):
      if obs == 1:
           gt = top1
@@ -732,29 +744,10 @@ while running:
          1
     )
 
-    pygame.draw.rect(
-         screen,
-         (80,80,80),
-         (obstacle1_x, 0, obstacle_width, top1)
-    )
-
-    pygame.draw.rect(
-         screen,
-         (80,80,80),
-         (obstacle1_x, bottom1, obstacle_width, height - bottom1)
-    )
-
-    pygame.draw.rect(
-        screen,
-        (80, 80, 80),
-        (obstacle2_x, 0, obstacle_width, top2)
-    )
-
-    pygame.draw.rect(
-        screen,
-        (80, 80, 80),
-        (obstacle2_x, bottom2, obstacle_width, height - bottom2)
-    )
+    draw_ruin_pillar(screen, obstacle1_x, 0, obstacle_width, top1, "bottom")
+    draw_ruin_pillar(screen, obstacle1_x, bottom1, obstacle_width, height - bottom1, "top")
+    draw_ruin_pillar(screen, obstacle2_x, 0, obstacle_width, top2, "bottom")
+    draw_ruin_pillar(screen, obstacle2_x, bottom2, obstacle_width, height - bottom2, "top")
 
     for coin_x, coin_y_pos, coin_obs, coin_frac in coin_list:
          pygame.draw.circle(
