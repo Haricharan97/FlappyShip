@@ -568,7 +568,7 @@ while running:
 
     pygame.draw.polygon(
          screen,
-         (35,135,157),
+         (35, 135, 157),
          front_points
     )
 
@@ -586,12 +586,151 @@ while running:
               (i, wave_y, 15, 5)
          )
 
+
+    pygame.draw.polygon(
+         screen,
+         (100, 50, 30),
+         [
+              (boat_x + boat_width - 5, boat_y + 15),
+              (boat_x + boat_width + 8, boat_y + 22),
+              (boat_x + boat_width - 15, boat_y + boat_height - 5)
+         ]
+    )
+
+    pygame.draw.polygon(
+         screen,
+         (60, 30, 15),
+         [
+              (boat_x + boat_width - 5, boat_y + 15),
+              (boat_x + boat_width + 8, boat_y + 22),
+              (boat_x + boat_width - 15, boat_y + boat_height - 5)
+         ],
+         1
+    )
+
     pygame.draw.rect(
+         screen,
+         (180, 95, 45),
+         (boat_x + 5, boat_y + 10, boat_width - 10, 8)
+    )
+     
+    pygame.draw.polygon(
             screen,
-            (120,70,30),
-            (boat_x, boat_y, boat_width, boat_height)
+            (125, 65, 35),
+            [
+                 (boat_x, boat_y + 15),
+                 (boat_x + boat_width - 5, boat_y + 15),
+                 (boat_x + boat_width - 15, boat_y + boat_height),
+                 (boat_x + 15, boat_y + boat_height)
+            ]
         )
 
+    pygame.draw.polygon(
+         screen,
+         (95, 45, 25),
+         [
+              (boat_x + 10, boat_y + boat_height - 10),
+              (boat_x + boat_width - 15, boat_y + boat_height - 10),
+              (boat_x + boat_width - 15, boat_y + boat_height),
+              (boat_x + 15, boat_y + boat_height)
+         ]
+    )
+
+    pygame.draw.polygon(
+         screen,
+         (60, 30, 15),
+         [
+              (boat_x, boat_y + 15),
+              (boat_x + boat_width - 5, boat_y + + 15),
+              (boat_x + boat_width - 15, boat_y + boat_height),
+              (boat_x + 15, boat_y + boat_height)
+         ],
+         2
+    )
+
+    pygame.draw.rect(
+         screen,
+         (60, 30, 15),
+         (boat_x + 5, boat_y + 10, boat_width - 10, 8),
+         1
+    )
+
+    pygame.draw.rect(
+         screen,
+         (230, 230, 220),
+         (boat_x + 25, boat_y, 30, 15)
+    )
+
+    pygame.draw.rect(
+         screen,
+         (150, 150, 140),
+         (boat_x + 25, boat_y, 30, 15),
+         1
+    )
+
+
+    pygame.draw.rect(
+         screen,
+         (150, 40, 30),
+         (boat_x + 23, boat_y - 4, 34, 5)
+    )
+
+
+    pygame.draw.rect(
+          screen,
+          (80, 170, 220),
+          (boat_x + 35, boat_y + 3, 10, 8)
+     )
+
+    pygame.draw.rect(
+         screen,
+         (255, 255, 255),
+         (boat_x + 39, boat_y + 4, 2, 6)
+    )
+
+    pygame.draw.circle(
+         screen,
+         (80, 170, 220),
+         (boat_x + 15, boat_y + 22),
+         4
+    )
+
+    pygame.draw.circle(
+         screen,
+         (60, 30, 15),
+         (boat_x + 15, boat_y + 22),
+         4,
+         1
+    )
+
+    pygame.draw.line(
+         screen,
+         (90, 60, 30),
+         (boat_x + boat_width // 2, boat_y - 4),
+         (boat_x + boat_width // 2, boat_y - 45),
+         3
+    )
+
+    pygame.draw.polygon(
+         screen,
+         (245, 245, 235),
+         [
+              (boat_x + boat_width // 2, boat_y - 45),
+              (boat_x + boat_width // 2, boat_y - 6),
+              (boat_x + boat_width // 2 + 25, boat_y - 12)
+         ]
+    )
+
+    pygame.draw.polygon(
+         screen,
+         (150, 150, 140),
+         [
+              (boat_x + boat_width // 2, boat_y - 45),
+              (boat_x + boat_width // 2, boat_y - 6),
+              (boat_x + boat_width // 2 + 25, boat_y - 12)
+         ],
+         1
+    )
     pygame.draw.rect(
          screen,
          (80,80,80),
