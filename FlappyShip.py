@@ -96,17 +96,46 @@ def near_obs(x):
 
      return 2
 
-def draw_ruin_pillar(screen, x, y, w, h, broker_edge):
-     if h <= 0:
-          return
+def draw_obstacle(x, top, bottom):
+     pygame.draw.rect(
+          screen, (75, 75, 70), (x, 0, obstacle_width, top)
+     )
 
-     stone = (95, 92, 82)
-     stone_dark = (70, 68, 60)
-     stone_light = (115, 112, 100)
-     algae = (60, 110, 70)
-     algae_dark = (40, 85, 55)
+     pygame.draw.rect(
+          screen, (105, 105, 95), (x + 6, 0 ,12, top)
+     )
 
-     pygame.draw.rect(screen, stone, (x, y, w, h))
+     pygame.draw.rect(
+          screen, (50, 50, 48), (x + obstacle_width - 10, 0, 10, top)
+     )
+
+     pygame.draw.rect(
+         screen, (95, 95, 85), (x - 7, top - 18, obstacle_width + 14, 18)
+     )
+
+     pygame.draw.rect(
+          screen, (45, 45, 42), (x - 7, top - 4, obstacle_width + 14, 4)
+     )
+
+     pygame.draw.rect(
+          screen, (75, 75, 70), (x, bottom, obstacle_width, height - bottom)
+     )
+
+     pygame.draw.rect(
+          screen, (105, 105, 95), (x + 6, bottom, 12, height - bottom)
+     )
+
+     pygame.draw.rect(
+          screen, (50, 50, 48), (x + obstacle_width - 10, bottom, 10, height - bottom)
+     )
+
+     pygame.draw.rect(
+          screen, (95, 95, 85), (x - 7, bottom, obstacle_width + 14, 18)
+     )
+
+     pygame.draw.rect(
+          screen, (45, 45, 42), (x - 7, bottom, obstacle_width + 14, 4)
+     )
 
 def coin_y(obs, frac):
      if obs == 1:
@@ -159,7 +188,8 @@ paused = 2
 game_state = start
 
 running = True
-
+def getwavey(x, offset, base_y, size):
+     return(base_y + math.sin(x + offset) * 0.025) * size
 while running:
     clock.tick(60)
 
@@ -744,10 +774,8 @@ while running:
          1
     )
 
-    draw_ruin_pillar(screen, obstacle1_x, 0, obstacle_width, top1, "bottom")
-    draw_ruin_pillar(screen, obstacle1_x, bottom1, obstacle_width, height - bottom1, "top")
-    draw_ruin_pillar(screen, obstacle2_x, 0, obstacle_width, top2, "bottom")
-    draw_ruin_pillar(screen, obstacle2_x, bottom2, obstacle_width, height - bottom2, "top")
+    draw_obstacle(obstacle1_x, top1, bottom1)
+    draw_obstacle(obstacle2_x, top2, bottom2)
 
     for coin_x, coin_y_pos, coin_obs, coin_frac in coin_list:
          pygame.draw.circle(
