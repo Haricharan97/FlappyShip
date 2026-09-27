@@ -54,9 +54,13 @@ FlappyShip is built with **Python and Pygame** and uses **Pygbag** to run direct
 
 ## Gallery
 
-| Start Screen | Gameplay | Treasure | Game Over|
-|---|---|---|-----|
-| ![Start Screen](./assets/1.png) | ![Gameplay](./assets/2.png) | ![Paused](./assets/3.png) | ![Game Over](./assets/4.png) |
+| Start Screen | Gameplay|
+|---|---|
+| ![Start Screen](./assets/1.png) | ![Gameplay](./assets/2.png)| 
+
+|Treasure | Game Over|
+|---|---|
+| ![Treasure](./assets/3.png) | ![Game Over](./assets/4.png) | 
 
 
 ---
