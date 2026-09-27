@@ -1,3 +1,4 @@
+import asyncio
 import pygame
 import random
 import math
@@ -58,11 +59,10 @@ passed1 = False
 passed2 = False
 
 coins = 0
-
+coinswtre = 0
 coin_size = 20
 
 coin_gap = 190
-coin_margin = 35
 coin_list = []
 
 def coin_blocked(x):
@@ -171,11 +171,33 @@ def spawn_coins():
 
 coin_list = spawn_coins()
 
-treasure_x = width + 100
-treasure_y = random.randint(100, 300)
-treasure_size = 28
-treasure_active = False
-treasure_timer = 0
+treasure_size = 30
+max_treasures = 3
+
+treasure_list = []
+
+def new_treasure(start_x):
+     x = safe_x(start_x)
+
+     if abs(x - obstacle1_x) < obstacle_width + treasure_size + 40:
+          x = obstacle1_x + obstacle_width + treasure_size + 40
+
+     if abs(x - obstacle2_x) < obstacle_width + treasure_size + 40:
+          x = obstacle2_x + obstacle_width + treasure_size + 40
+
+     if near_obs(x) == 1:
+          y = random.randint(
+               int(top1 + treasure_size + 15),
+               int(bottom1 - treasure_size - 15)
+          )
+     else:
+          y = random.randint(
+               int(top2 + treasure_size + 15),
+               int(bottom2 - treasure_size - 15)
+          )
+
+     return [x, y]
+     
 wave_offset = 0
 water = 360
 
@@ -188,8 +210,64 @@ paused = 2
 game_state = start
 
 running = True
+
 def getwavey(x, offset, base_y, size):
-     return(base_y + math.sin(x + offset) * 0.025) * size
+     return(
+          base_y 
+          + math.sin((x + offset) * 0.018) * size 
+          + math.sin((x + offset) * 0.045) * (size * 0.35) 
+          + math.sin((x + offset) * 0.09) * (size * 0.15)
+     )
+
+def draw_wave(color, offset, base_y, size, step):
+     points = [(0, height)]
+     for x in range(0, width + step, step):
+          wave_y = getwavey(x, offset, base_y, size)
+          points.append((x, int(wave_y)))
+
+     points.append((width, height))
+     pygame.draw.polygon(screen, color, points)
+
+def draw_treasure(x, y):
+     tx = int(x)
+     ty = int(y)
+
+     pygame.draw.rect(
+          screen, (118, 72, 28), (tx - 12, ty - 3, 24, 14), border_radius = 3
+     )
+
+     pygame.draw.rect(
+          screen, (160, 95, 35), (tx - 13, ty - 12, 26, 10), border_radius = 4
+     )
+
+     pygame.draw.rect(
+          screen, (222, 180, 60), (tx - 13, ty - 5, 26, 3)
+     )
+
+     pygame.draw.rect(
+          screen, (222, 180, 60), (tx - 2, ty - 3, 4, 14)
+     )
+
+     pygame.draw.rect(
+          screen, (222, 180, 60), (tx - 10, ty + 2, 20, 3)
+     )
+
+     pygame.draw.rect(
+          screen, (80, 45, 15), (tx - 12, ty - 3, 24, 14), 2, border_radius = 3
+     )
+
+     pygame.draw.rect(
+          screen, (80, 45, 15), (tx - 13, ty - 12, 26, 10), 2, border_radius = 4
+     )
+
+     pygame.draw.rect(
+          screen, (245, 220, 105), (tx - 3, ty + 1, 6, 5), border_radius = 2
+     )
+
+     pygame.draw.circle(
+          screen, (255, 240, 170), (tx - 5, ty - 8), 2
+     )
+     
 while running:
     clock.tick(60)
 
@@ -228,14 +306,11 @@ while running:
                     passed2 = False
 
                     coins = 0
-
+                    coinswtre = 0
                     coin_list = spawn_coins()
 
-                    treasure_active = False
-                    treasure_timer = 0
-
-                    treasure_x = width + 100
-                    treasure_y = random.randint(100,300)
+                    treasure_list = []
+                    
 
                     obstacle_speed = 4 
                     wave_offset = 0
@@ -345,66 +420,44 @@ while running:
                   mx += coin_gap
                   nd = new_coin(mx)
                   c[0], c[1], c[2], c[3] = nd
-
-        treasure_timer = treasure_timer + 1
      
-        if treasure_active == False and treasure_timer > 180:
+        if coinswtre >= 7 and len(treasure_list) < max_treasures:
+             start_x = width + 140
 
-             if random.randint(1, 100) <= 3:
-                  treasure_active = True
-                  treasure_x = width + 120
+             if len(treasure_list) > 0:
+                  start_x = max(
+                       start_x, max(t[0] for t in treasure_list) + 170
+                  )
+
+             treasure_list.append(
+                  new_treasure(start_x)
+             )
+
+             coinswtre = 0
              
-             if abs(treasure_x - obstacle1_x) < obstacle_width + treasure_size + 35:
-                  treasure_x = (
-                       obstacle1_x
-                       + obstacle_width
-                       + obstacle_width
-                       + treasure_size
-                       + 35
-                  )
-
-             if abs(treasure_x - obstacle2_x) < obstacle_width + treasure_size + 35:
-                  treasure_x = (
-                       obstacle2_x
-                       + obstacle_width
-                       + obstacle_width
-                       + treasure_size
-                       + 35
-                  )
-
-             if near_obs (treasure_x) == 1:
-                  treasure_y = random.randint(
-                       int(top1 + treasure_size + 15),
-                       int(bottom1 - treasure_size - 15)
-                  )
-             else:
-                  treasure_y = random.randint(
-                       int(top2 + treasure_size + 15) ,
-                       int(bottom2 - treasure_size - 15)
-                  )
-
-             treasure_timer = 0
-        if treasure_active == True:
-             treasure_x = treasure_x - obstacle_speed
-             if obstacle1_x - (treasure_size + 30) <= treasure_x <= obstacle1_x + obstacle_width + (treasure_size + 30):
-                  treasure_x = (
+             
+        for treasure in treasure_list:
+             treasure[0] = treasure[0] - obstacle_speed
+             if obstacle1_x - (treasure_size + 30) <= treasure[0] <= obstacle1_x + obstacle_width + (treasure_size + 30):
+                  treasure[0] = (
                        obstacle1_x
                        + obstacle_width
                        + treasure_size
                        + 30
                   )
-             if obstacle2_x - (treasure_size + 30) <= treasure_x <= obstacle2_x + obstacle_width + (treasure_size + 30):
-                  treasure_x = (
+             if obstacle2_x - (treasure_size + 30) <= treasure[0] <= obstacle2_x + obstacle_width + (treasure_size + 30):
+                  treasure[0] = (
                        obstacle2_x
                        + obstacle_width
                        + treasure_size
                        + 30
                   )
           
-        if treasure_x < -treasure_size:
-                 treasure_active = False
-                 treasure_timer = 0
-
+        treasure_list = [
+                 treasure
+                 for treasure in treasure_list
+                 if treasure[0] > -treasure_size
+         ]
         if obstacle1_x + obstacle_width < boat_x and passed1 == False:
 
             score = score + 1
@@ -501,13 +554,6 @@ while running:
         obstacle_width,
         height - bottom2
     )
-              
-    treasure_rect = pygame.Rect(
-         treasure_x - treasure_size // 2,
-         treasure_y - treasure_size // 2,
-         treasure_size,
-         treasure_size
-    )
 
     if game_state == playing and game_over == False:
 
@@ -536,6 +582,7 @@ while running:
 
                  if boat_rect.colliderect(coin_rect):
                       coins += 1
+                      coinswtre += 1
                       mx = max(
                            max(c[0] for c in coin_list),
                            obstacle1_x + obstacle_width,
@@ -546,99 +593,34 @@ while running:
                       nd = new_coin(mx)
                       coin[0], coin[1], coin[2], coin[3] = nd
 
-            if treasure_active == True:
-                if boat_rect.colliderect(treasure_rect):
-                    coins = coins + 5
-                    treasure_active = False
-                    treasure_timer = 0
+            for treasure in treasure_list[:]:
+               treasure_rect = pygame.Rect(
+                    int(treasure[0] - treasure_size // 2),
+                    int(treasure[1] - treasure_size // 2),
+                    treasure_size,
+                    treasure_size
+            )
+                
+               if boat_rect.colliderect(treasure_rect):
+                    coins += 5
+                    treasure_list.remove(treasure)
 
     screen.fill((70,150,220))
 
-    back_points = [(0, height)]
-
-    for i in range(0, width + 10, 10):
-
-         wave_y = (
-              water
-              + math.sin((i + wave_offset)*0.02)*15
-              + math.sin((i + wave_offset)*0.04)*8
-         )
-
-         back_points.append((i, wave_y + 40))
-
-    back_points.append((width, height))
+    draw_wave(
+         (8, 55, 82), wave_offset * 0.45, water + 6, 8, 12)
+    
+    draw_wave(
+         (10, 91, 120), wave_offset * 0.7, water + 30, 14, 10)
 
     pygame.draw.polygon(
-         screen,
-         (8,55,82),
-         back_points
-    )
-
-    middle_points = [(0,height)]
-
-    for i in range(0, width +10, 10):
-
-         wave_y = (
-              water
-              + math.sin((i + wave_offset) * 0.02) * 15
-              + math.sin((i + wave_offset) * 0.04) * 8
-         )
-
-         middle_points.append((i, wave_y + 20))
-
-    middle_points.append((width, height))
-
-    pygame.draw.polygon(
-         screen,
-         (10, 91, 120),
-         middle_points
-    )
-
-    front_points = [(0, height)]
-
-    for i in range(0, width + 10, 10):
-
-         wave_y = (
-              water
-              + math.sin((i + wave_offset) * 0.02) * 15
-              +math.sin((i + wave_offset) * 0.04) * 8
-         )
-
-         front_points.append((i, wave_y))
-
-    front_points.append((width, height))
-
-    pygame.draw.polygon(
-         screen,
-         (35, 135, 157),
-         front_points
-    )
-
-    for i in range(0, width, 30):
-
-         wave_y = (
-              water
-              + math.sin((i + wave_offset) * 0.02) * 15
-              +math.sin((i + wave_offset) * 0.04) * 8
-         )
-
-         pygame.draw.rect(
-              screen,
-              (115, 205, 204),
-              (i, wave_y, 15, 5)
-         )
-
-
-    pygame.draw.polygon(
-         screen,
-         (100, 50, 30),
-         [
+         screen, (100, 50, 30), [
               (boat_x + boat_width - 5, boat_y + 15),
               (boat_x + boat_width + 8, boat_y + 22),
               (boat_x + boat_width - 15, boat_y + boat_height - 5)
          ]
     )
-
+    
     pygame.draw.polygon(
          screen,
          (60, 30, 15),
@@ -683,7 +665,7 @@ while running:
          (60, 30, 15),
          [
               (boat_x, boat_y + 15),
-              (boat_x + boat_width - 5, boat_y + + 15),
+              (boat_x + boat_width - 5, boat_y + 15),
               (boat_x + boat_width - 15, boat_y + boat_height),
               (boat_x + 15, boat_y + boat_height)
          ],
@@ -777,8 +759,11 @@ while running:
     draw_obstacle(obstacle1_x, top1, bottom1)
     draw_obstacle(obstacle2_x, top2, bottom2)
 
-    for coin_x, coin_y_pos, coin_obs, coin_frac in coin_list:
-         pygame.draw.circle(
+    for coin in coin_list: 
+     coin_x = coin[0]
+     coin_y_pos = coin[1]
+
+     pygame.draw.circle(
               screen,
               (150, 90, 0),
               (
@@ -789,76 +774,71 @@ while running:
 
          )
 
-         pygame.draw.circle(
-              screen,
-              (255, 190, 0),
-              (
-                   int(coin_x),
-                   int(coin_y_pos)
-              ),
-              coin_size // 2 - 2
-         )
+     pygame.draw.circle(
+          screen,
+          (255, 190, 0),
+          (
+               int(coin_x),
+               int(coin_y_pos)
+          ),
+          coin_size // 2 - 2
+     )
 
-         pygame.draw.circle(
-              screen,
-              (255, 220, 70),
-              (
-                   int(coin_x),
-                   int(coin_y_pos)
-              ),
-              coin_size // 2 - 5
-         )
+     pygame.draw.circle(
+          screen,
+          (255, 220, 70),
+          (
+               int(coin_x),
+               int(coin_y_pos)
+          ),
+          coin_size // 2 - 5
+     )
 
-         pygame.draw.circle(
-              screen,
-              (210, 140, 0),
-              (
-                   int(coin_x),
-                   int(coin_y_pos)
-              ),
-              3
-         )
+     pygame.draw.circle(
+          screen,
+          (210, 140, 0),
+          (
+               int(coin_x),
+               int(coin_y_pos)
+          ),
+          3
+     )
 
-         pygame.draw.circle(
-              screen,
-              (255, 255, 210),
-              (
-                   int(coin_x - 3),
-                   int(coin_y_pos - 3)
-              ),
-              2
-         )
+     pygame.draw.circle(
+          screen,
+          (255, 255, 210),
+          (
+               int(coin_x - 3),
+               int(coin_y_pos - 3)
+          ),
+          2
+     )
 
-    if treasure_active == True:
-         pygame.draw.circle(
-              screen,
-              (100,55,20),
-              (
-                   int(treasure_x),
-                   int(treasure_y)
-              ),
-              16
-         )
+    for treasure_x, treasure_y in treasure_list:
+         draw_treasure(treasure_x, treasure_y)
 
-         pygame.draw.circle(
-              screen,
-              (180,100,35),
-              (
-                   int(treasure_x),
-                   int(treasure_y)
-              ),
-              9
-         )
+    water_overlay = pygame.Surface((width, height), pygame.SRCALPHA)
 
-         pygame.draw.circle(
-              screen,
-              (255, 190, 50),
-              (
-                   int(treasure_x),
-                   int(treasure_y)
-              ),
-              4
-         )
+    overlay_points = [(0, height)]
+
+    for x in range(0, width + 8, 8):
+          wave_y = getwavey(
+               x, wave_offset, water, 20
+          )
+
+          overlay_points.append(
+               (x, int(wave_y))
+          )
+
+    overlay_points.append((width, height))
+
+    pygame.draw.polygon(
+          water_overlay, (35, 135, 157, 120), overlay_points
+     )
+
+    screen.blit(
+          water_overlay, (0, 0)
+     )
 
     score_text = font.render(
         str(score),
